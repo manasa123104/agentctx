@@ -2,15 +2,23 @@
 {% block title %}agentctx · rules{% endblock %}
 {% block content %}
 <h1 class="page-title">Rules atlas</h1>
-<p class="lede">Every check the scanner can raise — context files and MCP configs.</p>
+<p class="lede">Search any rule and read what it means in plain English — plus how to fix it.</p>
+
+<input class="search-box" id="ruleSearch" type="search" placeholder="Search rules (e.g. secret, tree, npm)…" />
 
 <h2 class="panel" style="border:0;background:transparent;padding-left:0">Context rules</h2>
 <div class="desk two">
   {% for rule in context_rules %}
-  <article class="panel rule-card">
+  <article class="panel rule-card" data-rule-card="{{ rule.id }} {{ rule.summary }} {{ rule.plain }}">
     <span class="badge {{ rule.severity }}">{{ rule.severity }}</span>
     <h3>{{ rule.id }}</h3>
     <p>{{ rule.summary }}</p>
+    <div class="help-card">
+      <div class="label">In plain English</div>
+      <div>{{ rule.plain }}</div>
+      <div class="label" style="margin-top:0.35rem">How to fix</div>
+      <div>{{ rule.fix }}</div>
+    </div>
   </article>
   {% endfor %}
 </div>
@@ -18,10 +26,16 @@
 <h2 class="panel" style="border:0;background:transparent;padding-left:0;margin-top:1.5rem">MCP rules</h2>
 <div class="desk two">
   {% for rule in mcp_rules %}
-  <article class="panel rule-card">
+  <article class="panel rule-card" data-rule-card="{{ rule.id }} {{ rule.summary }} {{ rule.plain }}">
     <span class="badge {{ rule.severity }}">{{ rule.severity }}</span>
     <h3>{{ rule.id }}</h3>
     <p>{{ rule.summary }}</p>
+    <div class="help-card">
+      <div class="label">In plain English</div>
+      <div>{{ rule.plain }}</div>
+      <div class="label" style="margin-top:0.35rem">How to fix</div>
+      <div>{{ rule.fix }}</div>
+    </div>
   </article>
   {% endfor %}
 </div>

@@ -221,6 +221,62 @@
     .quick-chip button {
       font-size: 0.75rem; padding: 0.4rem 0.65rem; background: transparent; color: var(--ink);
     }
+    .welcome {
+      position: relative;
+      border: 1px solid var(--ink);
+      background: linear-gradient(120deg, #fffaf4, #f3ebe1 55%, #e7f0ea);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.1rem;
+      animation: rise 500ms ease-out both;
+    }
+    .welcome h2 { font-family: "Syne", sans-serif; margin: 0 0 0.35rem; font-size: 1.15rem; }
+    .welcome p { margin: 0; color: var(--mute); }
+    .welcome .dismiss {
+      position: absolute; top: 0.55rem; right: 0.55rem;
+      background: transparent; color: var(--mute); border: 0; font-size: 0.8rem; padding: 0.2rem 0.4rem;
+    }
+    .steps {
+      display: grid; gap: 0.45rem; margin: 1rem 0 1.25rem;
+    }
+    @media (min-width: 800px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+    .step {
+      border: 1px solid var(--line); background: var(--panel); padding: 0.7rem 0.8rem;
+      font-size: 0.92rem; color: var(--mute); text-decoration: none; color: inherit;
+      transition: transform 150ms ease, border-color 150ms ease;
+    }
+    .step:hover { transform: translateY(-2px); border-color: var(--ink); }
+    .step b { display: block; font-family: "Syne", sans-serif; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--moss); margin-bottom: 0.2rem; }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--mute);
+      margin: 0.5rem 0 0.85rem;
+    }
+    .help-card {
+      border: 1px dashed var(--line); padding: 0.55rem 0.65rem; margin-top: 0.4rem; background: #fffaf4; color: var(--ink);
+    }
+    .help-card .label { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; text-transform: uppercase; color: var(--mute); }
+    .simple-bar {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: space-between;
+      margin: 0.5rem 0 1rem;
+    }
+    .toggle {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; border: 1px solid var(--line);
+      background: var(--panel); padding: 0.4rem 0.65rem; cursor: pointer; color: var(--ink);
+    }
+    .toggle.on { background: var(--moss-deep); color: var(--paper); border-color: var(--moss-deep); }
+    body.simple-mode .advanced-only { display: none !important; }
+    body.simple-mode .simple-only { display: block !important; }
+    .simple-only { display: none; }
+    .search-box {
+      width: 100%; border: 1px solid var(--line); background: var(--panel); padding: 0.65rem 0.75rem;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; margin-bottom: 0.85rem;
+    }
+    .checklist { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+    .checklist li {
+      display: flex; gap: 0.55rem; align-items: flex-start; padding: 0.45rem 0;
+      border-bottom: 1px solid var(--line); color: var(--mute);
+    }
+    .checklist input { margin-top: 0.2rem; }
     #themePulse { width: 10px; height: 10px; border-radius: 50%; background: var(--moss); display: inline-block; animation: nudge 1.6s ease-in-out infinite; }
     a { color: var(--moss); }
     @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -238,6 +294,28 @@
         {% endfor %}
       </nav>
       <div class="engine"><span id="themePulse" aria-hidden="true"></span> {{ framework }}</div>
+    </div>
+
+    <div class="welcome" id="welcomeBanner">
+      <button type="button" class="dismiss" id="dismissWelcome" aria-label="Dismiss welcome">✕</button>
+      <h2>Welcome — start in 4 clicks</h2>
+      <p>agentctx checks AI instruction files for mistakes. New users: follow the steps, then open Studio.</p>
+      <div class="steps" style="margin-bottom:0;margin-top:0.75rem">
+        <a class="step" href="/guide"><b>Step 1</b>Read the guide</a>
+        <a class="step" href="/examples"><b>Step 2</b>Run a demo</a>
+        <a class="step" href="/studio"><b>Step 3</b>Paste your file</a>
+        <a class="step" href="/rules"><b>Step 4</b>Learn the rules</a>
+      </div>
+    </div>
+
+    <div class="simple-bar">
+      <div class="legend">
+        <span>Legend:</span>
+        <span class="badge error">error = must fix</span>
+        <span class="badge warn">warn = should improve</span>
+        <span class="badge info">info = optional tip</span>
+      </div>
+      <button type="button" class="toggle" id="simpleToggle">Simple mode: off</button>
     </div>
     {% block content %}{% endblock %}
   </div>
@@ -362,6 +440,53 @@
         if (e.key === "Escape" && document.activeElement.tagName === "TEXTAREA") {
           document.activeElement.blur();
         }
+      });
+
+      // Welcome banner dismiss
+      const welcome = document.getElementById("welcomeBanner");
+      if (welcome && localStorage.getItem("agentctx_welcome_v1") === "1") {
+        welcome.style.display = "none";
+      }
+      document.getElementById("dismissWelcome")?.addEventListener("click", () => {
+        if (welcome) welcome.style.display = "none";
+        localStorage.setItem("agentctx_welcome_v1", "1");
+        showToast("Welcome tip hidden — reopen Guide anytime");
+      });
+
+      // Simple mode
+      const simpleBtn = document.getElementById("simpleToggle");
+      const applySimple = (on) => {
+        document.body.classList.toggle("simple-mode", on);
+        if (simpleBtn) {
+          simpleBtn.classList.toggle("on", on);
+          simpleBtn.textContent = on ? "Simple mode: on" : "Simple mode: off";
+        }
+        localStorage.setItem("agentctx_simple_v1", on ? "1" : "0");
+      };
+      applySimple(localStorage.getItem("agentctx_simple_v1") === "1");
+      simpleBtn?.addEventListener("click", () => {
+        applySimple(!document.body.classList.contains("simple-mode"));
+        showToast(document.body.classList.contains("simple-mode") ? "Simple mode on" : "Simple mode off");
+      });
+
+      // Rules search
+      const ruleSearch = document.getElementById("ruleSearch");
+      ruleSearch?.addEventListener("input", () => {
+        const q = ruleSearch.value.toLowerCase().trim();
+        document.querySelectorAll("[data-rule-card]").forEach((card) => {
+          const hay = (card.getAttribute("data-rule-card") || "").toLowerCase();
+          card.style.display = !q || hay.includes(q) ? "" : "none";
+        });
+      });
+
+      // Checklist persistence
+      document.querySelectorAll("[data-check-id]").forEach((box) => {
+        const id = box.getAttribute("data-check-id");
+        box.checked = localStorage.getItem("agentctx_check_" + id) === "1";
+        box.addEventListener("change", () => {
+          localStorage.setItem("agentctx_check_" + id, box.checked ? "1" : "0");
+          showToast(box.checked ? "Step checked" : "Step unchecked");
+        });
       });
     })();
   </script>

@@ -1,9 +1,83 @@
-"""Friendly input analysis for new users (random / empty / invalid text)."""
+"""Friendly input analysis and plain-English help for new users."""
 from __future__ import annotations
 
 import json
 import re
 from typing import Any
+
+RULE_HELP = {
+    "stale-file-ref": {
+        "plain": "The file mentions a path that isn’t in the project.",
+        "fix": "Delete the path or rename it to a file/folder that actually exists.",
+    },
+    "stale-command": {
+        "plain": "A build/test command doesn’t match your package scripts (or Makefile/Cargo/etc.).",
+        "fix": "Change the command to a real script name, or add that script to package.json.",
+    },
+    "no-directory-tree": {
+        "plain": "There’s a folder tree drawn in the file. Agents can list folders themselves.",
+        "fix": "Delete the tree block to save tokens and avoid stale structure.",
+    },
+    "redundant-readme": {
+        "plain": "A lot of this text already appears in README.md.",
+        "fix": "Keep only agent-specific notes; point to the README for install docs.",
+    },
+    "no-inferable-stack": {
+        "plain": "You’re describing the tech stack in prose, but the agent can already see it from package files.",
+        "fix": "Remove “this is a React/TypeScript app…” style lines unless there’s a non-obvious constraint.",
+    },
+    "max-lines": {
+        "plain": "The context file is getting long, which usually means noise.",
+        "fix": "Cut duplicated docs and keep only must-know constraints.",
+    },
+    "no-style-guide": {
+        "plain": "Style tips (quotes, const vs let) belong in a linter/formatter config.",
+        "fix": "Remove those bullets; keep ESLint/Prettier as the source of truth.",
+    },
+    "token-budget": {
+        "plain": "A rough cost/quality score for how noisy this file is.",
+        "fix": "Fix errors/warnings above — the score usually improves after cleanup.",
+    },
+    "ci-coverage": {
+        "plain": "You have CI workflows the context file never mentions.",
+        "fix": "Optional: note how agents should react to CI failures.",
+    },
+    "mcp-schema": {
+        "plain": "The MCP file isn’t shaped correctly.",
+        "fix": 'Use { "mcpServers": { "name": { "command": "…" } } }.',
+    },
+    "mcp-missing-command": {
+        "plain": "A server entry can’t start — no command and no url.",
+        "fix": "Add a command (local process) or a url (remote server).",
+    },
+    "mcp-hardcoded-secret": {
+        "plain": "A secret/API key is written directly in the config.",
+        "fix": 'Replace with an env reference like "${API_KEY}".',
+    },
+    "mcp-localhost-url": {
+        "plain": "This server only works on your machine (localhost).",
+        "fix": "Fine for local dev; use a shared URL for teammates/CI.",
+    },
+    "mcp-deprecated-transport": {
+        "plain": "SSE transport is outdated in modern MCP clients.",
+        "fix": "Remove the transport field and use the default HTTP setup.",
+    },
+    "mcp-env-syntax": {
+        "plain": "Environment variable syntax doesn’t match this editor/client.",
+        "fix": "In VS Code MCP configs, prefer ${env:VAR}.",
+    },
+}
+
+
+def enrich_diagnostics(diagnostics: list[dict] | None) -> list[dict]:
+    out = []
+    for d in diagnostics or []:
+        item = dict(d)
+        help_ = RULE_HELP.get(item.get("rule") or "", {})
+        item["plain"] = help_.get("plain") or "This finding needs a closer look."
+        item["fix"] = help_.get("fix") or (item.get("suggestion") or "Follow the suggestion above.")
+        out.append(item)
+    return out
 
 
 def _looks_like_noise(text: str) -> bool:
@@ -12,15 +86,12 @@ def _looks_like_noise(text: str) -> bool:
         return False
     if len(t) < 8:
         return True
-    # mostly symbols / keyboard mash
     letters = sum(c.isalpha() for c in t)
     if letters / max(len(t), 1) < 0.35:
         return True
-    # no structure cues for a context file
     cues = ("#", "-", "*", "`", "npm", "build", "test", "agent", "install", "http")
     if not any(c in t.lower() for c in cues) and len(t.split()) < 12:
         return True
-    # repeated same char
     if re.fullmatch(r"(.)\1{6,}", t):
         return True
     return False
@@ -140,7 +211,6 @@ def friendly_report(
     custom: dict | None,
     report: dict | None,
 ) -> dict[str, Any]:
-    """Combine pre-checks + lint results into a beginner-friendly payload."""
     agents = analyze_agents_text(agents_md)
     mcp = analyze_mcp_text(mcp_json or "") if (mcp_json and mcp_json.strip()) else None
 
@@ -148,7 +218,6 @@ def friendly_report(
     if mcp is not None:
         notices.append(mcp)
 
-    # If input is nonsense, skip scary empty lint noise — teach instead
     if not agents["ok"]:
         return {
             "mode": "teach",
@@ -182,6 +251,10 @@ def friendly_report(
         headline = "Looking clean"
         summary_line = "No errors or warnings. Nice work."
 
+    if report is not None:
+        report = dict(report)
+        report["diagnostics"] = enrich_diagnostics(report.get("diagnostics"))
+
     return {
         "mode": "lint",
         "notices": notices,
@@ -189,4 +262,13 @@ def friendly_report(
         "custom_result": custom,
         "headline": headline,
         "summary_line": summary_line,
+        "next_steps": (
+            [
+                "Fix errors first (red).",
+                "Re-run Generate report.",
+                "Then decide which warnings to keep.",
+            ]
+            if errors or warnings
+            else ["You’re done — keep the file short as the project evolves."]
+        ),
     }

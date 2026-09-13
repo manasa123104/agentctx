@@ -99,13 +99,26 @@
     {% if d.line %} · L{{ d.line }}{% endif %}
     {% if d.server %} · {{ d.server }}{% endif %}
     <div>{{ d.message }}</div>
-    {% if d.suggestion %}<div class="meta">{{ d.suggestion }}</div>{% endif %}
+    <div class="help-card">
+      <div class="label">In plain English</div>
+      <div>{{ d.plain }}</div>
+      <div class="label" style="margin-top:0.35rem">How to fix</div>
+      <div>{{ d.fix }}</div>
+    </div>
   </div>
   {% else %}
   <p class="ok">No diagnostics — looking sharp.</p>
   {% endfor %}
+  {% if friendly.next_steps %}
+  <div class="help-card" style="margin-top:0.8rem;background:#243028;border-style:solid;border-color:#3a5345;color:#efe6da">
+    <div class="label" style="color:#9fd0b4">What to do next</div>
+    <ol style="margin:0.35rem 0 0;padding-left:1.1rem">
+      {% for step in friendly.next_steps %}<li>{{ step }}</li>{% endfor %}
+    </ol>
+  </div>
+  {% endif %}
   {% if custom_result %}
-  <pre style="margin-top:1rem">{{ custom_result.check.stdout }}</pre>
+  <pre class="advanced-only" style="margin-top:1rem">{{ custom_result.check.stdout }}</pre>
   {% endif %}
 </section>
 {% endif %}

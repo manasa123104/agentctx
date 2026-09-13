@@ -18,7 +18,7 @@ from shared.catalog import (
     SAMPLE_MCP_BAD,
     SAMPLE_MCP_GOOD,
 )
-from shared.explain import analyze_mcp_text, friendly_report
+from shared.explain import RULE_HELP, analyze_mcp_text, friendly_report
 from shared.runner import (
     DEMO,
     DEMO_GOOD,
@@ -32,6 +32,17 @@ from shared.runner import (
 
 RANDOM_AGENTS = "asdfgh qwerty hello world !!!@@@\nzzzzzz"
 RANDOM_MCP = "this is not json at all lol 12345"
+
+
+def with_rule_help(rules):
+    enriched = []
+    for rule in rules:
+        item = dict(rule)
+        help_ = RULE_HELP.get(rule["id"], {})
+        item["plain"] = help_.get("plain", "")
+        item["fix"] = help_.get("fix", "")
+        enriched.append(item)
+    return enriched
 
 
 def base(active: str, **extra):
@@ -61,7 +72,11 @@ def rules(request):
     return render(
         request,
         "rules.html",
-        base("/rules", context_rules=CONTEXT_RULES, mcp_rules=MCP_RULES),
+        base(
+            "/rules",
+            context_rules=with_rule_help(CONTEXT_RULES),
+            mcp_rules=with_rule_help(MCP_RULES),
+        ),
     )
 
 
@@ -135,6 +150,7 @@ def studio(request):
             custom = lint_uploaded_context(agents_md, mcp_json or None)
             report = build_report(custom["check"], custom.get("mcp"))
             friendly = friendly_report(agents_md, mcp_json, custom, report)
+            report = friendly.get("report") or report
     return render(
         request,
         "studio.html",

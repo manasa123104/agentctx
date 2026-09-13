@@ -19,7 +19,7 @@ from shared.catalog import (  # noqa: E402
     SAMPLE_MCP_BAD,
     SAMPLE_MCP_GOOD,
 )
-from shared.explain import analyze_mcp_text, friendly_report  # noqa: E402
+from shared.explain import RULE_HELP, analyze_mcp_text, friendly_report  # noqa: E402
 from shared.runner import (  # noqa: E402
     DEMO,
     DEMO_GOOD,
@@ -65,6 +65,17 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", ctx(request, "/"))
 
 
+def with_rule_help(rules):
+    enriched = []
+    for rule in rules:
+        item = dict(rule)
+        help_ = RULE_HELP.get(rule["id"], {})
+        item["plain"] = help_.get("plain", "")
+        item["fix"] = help_.get("fix", "")
+        enriched.append(item)
+    return enriched
+
+
 @app.get("/guide", response_class=HTMLResponse)
 async def guide(request: Request):
     return templates.TemplateResponse("guide.html", ctx(request, "/guide"))
@@ -74,7 +85,12 @@ async def guide(request: Request):
 async def rules(request: Request):
     return templates.TemplateResponse(
         "rules.html",
-        ctx(request, "/rules", context_rules=CONTEXT_RULES, mcp_rules=MCP_RULES),
+        ctx(
+            request,
+            "/rules",
+            context_rules=with_rule_help(CONTEXT_RULES),
+            mcp_rules=with_rule_help(MCP_RULES),
+        ),
     )
 
 
@@ -173,6 +189,7 @@ async def studio_post(
         custom = lint_uploaded_context(agents_md, mcp_json or None)
         report = build_report(custom["check"], custom.get("mcp"))
         friendly = friendly_report(agents_md, mcp_json, custom, report)
+        report = friendly.get("report") or report
 
     return templates.TemplateResponse(
         "studio.html",

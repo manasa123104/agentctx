@@ -8,16 +8,20 @@
     <form class="controls" method="post" action="{{ run_url }}">
       <button type="submit" name="action" value="check">Scan context</button>
       <button class="ghost" type="submit" name="action" value="mcp">Scan MCP</button>
-      <button class="ghost" type="submit" name="action" value="gate">Full gate</button>
+      <button class="ghost advanced-only" type="submit" name="action" value="gate">Full gate</button>
     </form>
   </div>
-  <div class="orb" aria-hidden="true"><div class="orb-label">noise → signal</div></div>
+  <div class="orb advanced-only" aria-hidden="true"><div class="orb-label">noise → signal</div></div>
 </section>
 
 <div class="callout">
-  <strong>New here?</strong> Start with the <a href="/guide">User guide</a>,
-  then try <a href="/examples">Examples</a> or paste anything in <a href="/studio">Studio</a>
-  (even random text — we’ll explain what to do).
+  <strong>New here?</strong> Use Simple mode (top right), then follow the checklist.
+  <ul class="checklist">
+    <li><input type="checkbox" data-check-id="g1" /> <span>Open the <a href="/guide">User guide</a></span></li>
+    <li><input type="checkbox" data-check-id="g2" /> <span>Run <a href="/examples">demo-bad</a> to see errors</span></li>
+    <li><input type="checkbox" data-check-id="g3" /> <span>Run <a href="/examples">demo-good</a> to see a clean file</span></li>
+    <li><input type="checkbox" data-check-id="g4" /> <span>Paste your own text in <a href="/studio">Studio</a></span></li>
+  </ul>
   <div class="quick-chip">
     <a class="btn" href="/guide">Guide</a>
     <a class="btn ghost" href="/studio">Studio</a>
@@ -30,9 +34,11 @@
   <h2>Result · {{ action }}</h2>
   <p class="meta">
     exit {% if result.exit_code == 0 %}<span class="ok">{{ result.exit_code }}</span>{% else %}<span class="bad">{{ result.exit_code }}</span>{% endif %}
-    · {{ result.command }}
   </p>
-  <pre>{{ result.stdout }}{% if result.stderr %}
+  <p class="simple-only" style="color:#d9cfc3">
+    {% if result.exit_code == 0 %}All clear for this scan.{% else %}Something needs fixing — open Studio or Examples for plain-English help.{% endif %}
+  </p>
+  <pre class="advanced-only">{{ result.stdout }}{% if result.stderr %}
 
 {{ result.stderr }}{% endif %}</pre>
 </section>
@@ -66,10 +72,20 @@
     <div class="stat"><b>{{ report.summary.info }}</b><span>info</span></div>
   </div>
   {% for d in report.diagnostics %}
-  <div class="diag {{ d.severity }}"><strong>{{ d.rule }}</strong> · {{ d.message }}</div>
+  <div class="diag {{ d.severity }}">
+    <strong>{{ d.rule }}</strong> · {{ d.message }}
+    {% if d.plain %}
+    <div class="help-card">
+      <div class="label">In plain English</div>
+      <div>{{ d.plain }}</div>
+      <div class="label" style="margin-top:0.35rem">How to fix</div>
+      <div>{{ d.fix }}</div>
+    </div>
+    {% endif %}
+  </div>
   {% endfor %}
   {% endif %}
-  <pre style="margin-top:1rem">{{ custom_result.check.stdout }}</pre>
+  <pre class="advanced-only" style="margin-top:1rem">{{ custom_result.check.stdout }}</pre>
 </section>
 {% endif %}
 
@@ -78,17 +94,17 @@
     <h2>User guide</h2>
     <p class="lede" style="margin:0">Plain-language walkthrough for first-time users.</p>
   </a>
-  <a class="panel" href="/rules" style="text-decoration:none;color:inherit">
+  <a class="panel" href="/studio" style="text-decoration:none;color:inherit">
+    <h2>Paste studio</h2>
+    <p class="lede" style="margin:0">Lint your text — random input gets a friendly tip.</p>
+  </a>
+  <a class="panel advanced-only" href="/rules" style="text-decoration:none;color:inherit">
     <h2>Rules atlas</h2>
     <p class="lede" style="margin:0">Browse every context + MCP rule.</p>
   </a>
   <a class="panel" href="/examples" style="text-decoration:none;color:inherit">
     <h2>Live examples</h2>
     <p class="lede" style="margin:0">Compare clean vs noisy fixtures.</p>
-  </a>
-  <a class="panel" href="/studio" style="text-decoration:none;color:inherit">
-    <h2>Paste studio</h2>
-    <p class="lede" style="margin:0">Lint your text — random input gets a friendly tip.</p>
   </a>
 </section>
 {% endblock %}
