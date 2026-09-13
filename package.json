@@ -1,0 +1,46 @@
+{
+  "name": "agentctx",
+  "version": "1.0.0",
+  "description": "Lint AI agent context files and MCP configs. Clear workflow: init → check → slim → gate.",
+  "type": "module",
+  "bin": {
+    "agentctx": "./bin/agentctx.js"
+  },
+  "scripts": {
+    "test": "node --test test/rules.test.js test/commands.test.js",
+    "check": "node bin/agentctx.js check",
+    "workflow": "node bin/agentctx.js workflow"
+  },
+  "keywords": [
+    "agentctx",
+    "agents-md",
+    "claude-md",
+    "context-lint",
+    "ai-agents",
+    "mcp",
+    "developer-tools"
+  ],
+  "author": "manasa123104",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "WORKFLOW.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manasa123104/agentctx.git"
+  },
+  "homepage": "https://github.com/manasa123104/agentctx#readme",
+  "bugs": {
+    "url": "https://github.com/manasa123104/agentctx/issues"
+  }
+}
