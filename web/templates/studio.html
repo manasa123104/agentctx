@@ -2,29 +2,56 @@
 {% block title %}agentctx · studio{% endblock %}
 {% block content %}
 <h1 class="page-title">Paste studio</h1>
-<p class="lede">Drop in your AGENTS.md and optional MCP config. Get a scored report with rule cards.</p>
+<p class="lede">
+  Drop in your AGENTS.md and optional MCP config.
+  New users: type random text on purpose — we’ll tell you what’s wrong in plain English.
+  Prefer a walkthrough? See the <a href="/guide">User guide</a>.
+</p>
 
 <form class="panel" method="post" action="{{ studio_url }}">
   <div class="desk two">
     <div>
-      <label for="agents_md">AGENTS.md</label>
-      <textarea id="agents_md" name="agents_md">{{ agents_md }}</textarea>
+      <label for="agents_md">AGENTS.md (or any instruction text)</label>
+      <textarea id="agents_md" name="agents_md" placeholder="Paste here — or try typing asdfgh">{{ agents_md }}</textarea>
     </div>
     <div>
-      <label for="mcp_json">.mcp.json</label>
-      <textarea id="mcp_json" name="mcp_json">{{ mcp_json }}</textarea>
+      <label for="mcp_json">.mcp.json (optional)</label>
+      <textarea id="mcp_json" name="mcp_json" placeholder='{"mcpServers":{}}'>{{ mcp_json }}</textarea>
     </div>
   </div>
   <div class="controls" style="margin-top:0.9rem">
     <button type="submit">Generate report</button>
     <button class="ghost" type="submit" name="preset" value="bad">Fill noisy sample</button>
     <button class="ghost" type="submit" name="preset" value="good">Fill clean sample</button>
+    <button class="ghost" type="submit" name="preset" value="random">Try random text</button>
   </div>
 </form>
 
-{% if report %}
+{% if friendly and friendly.mode == "teach" %}
+<section class="teach">
+  <h2>{{ friendly.headline }}</h2>
+  <p>{{ friendly.summary_line }}</p>
+  {% for n in friendly.notices %}
+    <p><span class="badge {{ n.level if n.level != 'ok' else 'info' }}">{{ n.level }}</span> {{ n.title }}</p>
+    {% if n.tips %}
+    <ul>{% for tip in n.tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if n.example %}
+    <p class="meta">Starter template you can copy:</p>
+    <pre>{{ n.example }}</pre>
+    {% endif %}
+  {% endfor %}
+  <div class="controls" style="margin-top:0.8rem">
+    <a class="btn" href="/guide">Open user guide</a>
+    <a class="btn ghost" href="/examples">See examples</a>
+  </div>
+</section>
+{% endif %}
+
+{% if report and friendly and friendly.mode == "lint" %}
 <section class="out">
-  <h2>Report {% if report.passed %}<span class="ok">passed</span>{% else %}<span class="bad">failed</span>{% endif %}</h2>
+  <h2>{{ friendly.headline }}</h2>
+  <p class="meta">{{ friendly.summary_line }}</p>
   <div class="stat-row">
     <div class="stat"><b>{{ report.summary.errors }}</b><span>errors</span></div>
     <div class="stat"><b>{{ report.summary.warnings }}</b><span>warnings</span></div>

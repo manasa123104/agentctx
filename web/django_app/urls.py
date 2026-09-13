@@ -3,6 +3,7 @@ from webapp import views
 
 urlpatterns = [
     path("", views.home, name="home"),
+    path("guide", views.guide, name="guide"),
     path("rules", views.rules, name="rules"),
     path("examples", views.examples, name="examples"),
     path("mcp-lab", views.mcp_lab, name="mcp_lab"),

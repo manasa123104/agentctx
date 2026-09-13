@@ -18,6 +18,7 @@ from shared.catalog import (
     SAMPLE_MCP_BAD,
     SAMPLE_MCP_GOOD,
 )
+from shared.explain import analyze_mcp_text, friendly_report
 from shared.runner import (
     DEMO,
     DEMO_GOOD,
@@ -28,6 +29,9 @@ from shared.runner import (
     run_init_preview,
     run_mcp,
 )
+
+RANDOM_AGENTS = "asdfgh qwerty hello world !!!@@@\nzzzzzz"
+RANDOM_MCP = "this is not json at all lol 12345"
 
 
 def base(active: str, **extra):
@@ -40,12 +44,17 @@ def base(active: str, **extra):
         "mcp_lab_url": "/mcp-lab",
         "studio_url": "/studio",
         "about_url": "/about",
+        "guide_url": "/guide",
         **extra,
     }
 
 
 def home(request):
     return render(request, "index.html", base("/"))
+
+
+def guide(request):
+    return render(request, "guide.html", base("/guide"))
 
 
 def rules(request):
@@ -83,6 +92,7 @@ def examples(request):
 def mcp_lab(request):
     mcp_json = SAMPLE_MCP_BAD
     result = None
+    notice = None
     if request.method == "POST":
         preset = request.POST.get("preset")
         mcp_json = request.POST.get("mcp_json", "")
@@ -90,21 +100,26 @@ def mcp_lab(request):
             mcp_json = SAMPLE_MCP_BAD
         elif preset == "good":
             mcp_json = SAMPLE_MCP_GOOD
-        packed = lint_uploaded_context("# MCP lab\n", mcp_json)
-        result = packed["mcp"]
+        elif preset == "random":
+            mcp_json = RANDOM_MCP
+        notice = analyze_mcp_text(mcp_json)
+        if notice["ok"]:
+            packed = lint_uploaded_context("# MCP lab\n", mcp_json)
+            result = packed["mcp"]
     return render(
         request,
         "mcp_lab.html",
-        base("/mcp-lab", mcp_json=mcp_json, result=result),
+        base("/mcp-lab", mcp_json=mcp_json, result=result, notice=notice),
     )
 
 
 @require_http_methods(["GET", "POST"])
 def studio(request):
-    agents_md = SAMPLE_AGENTS_BAD
-    mcp_json = SAMPLE_MCP_BAD
+    agents_md = ""
+    mcp_json = ""
     custom = None
     report = None
+    friendly = None
     if request.method == "POST":
         preset = request.POST.get("preset")
         agents_md = request.POST.get("agents_md", "")
@@ -113,8 +128,13 @@ def studio(request):
             agents_md, mcp_json = SAMPLE_AGENTS_BAD, SAMPLE_MCP_BAD
         elif preset == "good":
             agents_md, mcp_json = SAMPLE_AGENTS_GOOD, SAMPLE_MCP_GOOD
-        custom = lint_uploaded_context(agents_md, mcp_json)
-        report = build_report(custom["check"], custom.get("mcp"))
+        elif preset == "random":
+            agents_md, mcp_json = RANDOM_AGENTS, RANDOM_MCP
+        friendly = friendly_report(agents_md, mcp_json, None, None)
+        if friendly["mode"] == "lint":
+            custom = lint_uploaded_context(agents_md, mcp_json or None)
+            report = build_report(custom["check"], custom.get("mcp"))
+            friendly = friendly_report(agents_md, mcp_json, custom, report)
     return render(
         request,
         "studio.html",
@@ -124,6 +144,7 @@ def studio(request):
             mcp_json=mcp_json,
             custom_result=custom,
             report=report,
+            friendly=friendly,
         ),
     )
 
@@ -148,8 +169,13 @@ def run_action(request):
 def lint_form(request):
     agents_md = request.POST.get("agents_md", "")
     mcp_json = request.POST.get("mcp_json", "")
-    custom = lint_uploaded_context(agents_md, mcp_json or None)
-    report = build_report(custom["check"], custom.get("mcp"))
+    friendly = friendly_report(agents_md, mcp_json, None, None)
+    custom = None
+    report = None
+    if friendly["mode"] == "lint":
+        custom = lint_uploaded_context(agents_md, mcp_json or None)
+        report = build_report(custom["check"], custom.get("mcp"))
+        friendly = friendly_report(agents_md, mcp_json, custom, report)
     return render(
         request,
         "index.html",
@@ -158,6 +184,7 @@ def lint_form(request):
             action="custom",
             custom_result=custom,
             report=report,
+            friendly=friendly,
             agents_md=agents_md,
             mcp_json=mcp_json,
         ),

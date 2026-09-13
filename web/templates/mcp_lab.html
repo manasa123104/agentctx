@@ -2,19 +2,34 @@
 {% block title %}agentctx · MCP lab{% endblock %}
 {% block content %}
 <h1 class="page-title">MCP lab</h1>
-<p class="lede">Validate `.mcp.json` alone — secrets, localhost URLs, schema, and transport.</p>
+<p class="lede">
+  Validate <code>.mcp.json</code> alone. Paste JSON, or random text — invalid input gets a clear explanation.
+  Need the basics? <a href="/guide">User guide</a>.
+</p>
 
 <form class="panel" method="post" action="{{ mcp_lab_url }}">
-  <label for="mcp_json">Paste MCP config</label>
+  <label for="mcp_json">Paste MCP config (or any text)</label>
   <textarea id="mcp_json" name="mcp_json">{{ mcp_json }}</textarea>
   <div class="controls" style="margin-top:0.8rem">
     <button type="submit">Validate MCP</button>
     <button class="ghost" type="submit" name="preset" value="bad">Load bad sample</button>
     <button class="ghost" type="submit" name="preset" value="good">Load good sample</button>
+    <button class="ghost" type="submit" name="preset" value="random">Try random text</button>
   </div>
 </form>
 
-{% if result %}
+{% if notice and not notice.ok %}
+<section class="teach">
+  <h2>{{ notice.title }}</h2>
+  <p>{{ notice.message }}</p>
+  {% if notice.tips %}
+  <ul>{% for tip in notice.tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if notice.example %}<pre>{{ notice.example }}</pre>{% endif %}
+</section>
+{% endif %}
+
+{% if result and (not notice or notice.ok) %}
 <section class="out">
   <h2>MCP result</h2>
   <p class="meta">exit {% if result.exit_code == 0 %}<span class="ok">{{ result.exit_code }}</span>{% else %}<span class="bad">{{ result.exit_code }}</span>{% endif %}</p>

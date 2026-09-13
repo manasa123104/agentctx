@@ -42,6 +42,7 @@ Multi-page desks for scanning context files and MCP configs.
 | Page | Path |
 |------|------|
 | Desk | `/` |
+| User guide | `/guide` |
 | Rules atlas | `/rules` |
 | Live examples | `/examples` |
 | MCP lab | `/mcp-lab` |

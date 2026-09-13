@@ -14,6 +14,12 @@
   <div class="orb" aria-hidden="true"><div class="orb-label">noise → signal</div></div>
 </section>
 
+<div class="callout">
+  <strong>New here?</strong> Start with the <a href="/guide">User guide</a>,
+  then try <a href="/examples">Examples</a> or paste anything in <a href="/studio">Studio</a>
+  (even random text — we’ll explain what to do).
+</div>
+
 {% if result %}
 <section class="out">
   <h2>Result · {{ action }}</h2>
@@ -27,9 +33,27 @@
 </section>
 {% endif %}
 
-{% if custom_result %}
+{% if friendly and friendly.mode == "teach" %}
+<section class="teach">
+  <h2>{{ friendly.headline }}</h2>
+  <p>{{ friendly.summary_line }}</p>
+  {% for n in friendly.notices %}
+    {% if n.tips %}
+    <ul>{% for tip in n.tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if n.example %}<pre>{{ n.example }}</pre>{% endif %}
+  {% endfor %}
+  <div class="controls" style="margin-top:0.8rem">
+    <a class="btn" href="/guide">Read the guide</a>
+    <a class="btn ghost" href="/studio">Try Studio</a>
+  </div>
+</section>
+{% endif %}
+
+{% if custom_result and (not friendly or friendly.mode == "lint") %}
 <section class="out">
-  <h2>Custom scan</h2>
+  <h2>{% if friendly %}{{ friendly.headline }}{% else %}Custom scan{% endif %}</h2>
+  {% if friendly %}<p class="meta">{{ friendly.summary_line }}</p>{% endif %}
   {% if report %}
   <div class="stat-row">
     <div class="stat"><b>{{ report.summary.errors }}</b><span>errors</span></div>
@@ -45,6 +69,10 @@
 {% endif %}
 
 <section class="desk two" style="margin-top:1.5rem">
+  <a class="panel" href="/guide" style="text-decoration:none;color:inherit">
+    <h2>User guide</h2>
+    <p class="lede" style="margin:0">Plain-language walkthrough for first-time users.</p>
+  </a>
   <a class="panel" href="/rules" style="text-decoration:none;color:inherit">
     <h2>Rules atlas</h2>
     <p class="lede" style="margin:0">Browse every context + MCP rule.</p>
@@ -53,13 +81,9 @@
     <h2>Live examples</h2>
     <p class="lede" style="margin:0">Compare clean vs noisy fixtures.</p>
   </a>
-  <a class="panel" href="/mcp-lab" style="text-decoration:none;color:inherit">
-    <h2>MCP lab</h2>
-    <p class="lede" style="margin:0">Validate server configs in isolation.</p>
-  </a>
   <a class="panel" href="/studio" style="text-decoration:none;color:inherit">
     <h2>Paste studio</h2>
-    <p class="lede" style="margin:0">Lint your own AGENTS.md + .mcp.json.</p>
+    <p class="lede" style="margin:0">Lint your text — random input gets a friendly tip.</p>
   </a>
 </section>
 {% endblock %}

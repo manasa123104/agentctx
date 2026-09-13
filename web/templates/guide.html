@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}agentctx · user guide{% endblock %}
+{% block content %}
+<h1 class="page-title">User guide</h1>
+<p class="lede">New here? This page explains agentctx in plain language — then shows you exactly where to click.</p>
+
+<div class="desk two">
+  <article class="panel">
+    <h2>1. What is this?</h2>
+    <p class="lede" style="margin:0">
+      AI coding tools read files like <code>AGENTS.md</code> or <code>CLAUDE.md</code> for project tips.
+      If those files are wrong or bloated, the agent wastes time and tokens.
+      <strong>agentctx checks those files</strong> (and MCP server configs) for common mistakes.
+    </p>
+  </article>
+  <article class="panel">
+    <h2>2. What should I paste?</h2>
+    <p class="lede" style="margin:0">
+      Paste markdown instructions (headings + bullet lists + real commands),
+      not random chat text. For MCP, paste JSON that starts with <code>{"mcpServers": ...}</code>.
+      If you type gibberish, the site will explain what went wrong instead of failing silently.
+    </p>
+  </article>
+</div>
+
+<div class="panel" style="margin-top:1rem">
+  <h2>3. Recommended path for beginners</h2>
+  <ol style="margin:0;padding-left:1.2rem;color:var(--mute);line-height:1.6">
+    <li><a href="/examples">Examples</a> → open <strong>demo-bad</strong> → Scan context (see real errors)</li>
+    <li>Same page → <strong>demo-good</strong> → Scan context (see a clean file)</li>
+    <li><a href="/studio">Studio</a> → Fill clean sample → edit it → Generate report</li>
+    <li><a href="/mcp-lab">MCP Lab</a> → Load bad sample → Validate (see secret/localhost warnings)</li>
+    <li><a href="/rules">Rules</a> → skim what each message means</li>
+  </ol>
+</div>
+
+<div class="desk two" style="margin-top:1rem">
+  <article class="panel">
+    <h2>4. Reading the results</h2>
+    <p class="lede" style="margin:0">
+      <span class="badge error">error</span> must fix ·
+      <span class="badge warn">warn</span> should improve ·
+      <span class="badge info">info</span> optional tip.<br/><br/>
+      Common fixes: delete directory trees, update dead <code>npm run …</code> scripts,
+      remove hardcoded API keys from MCP <code>env</code>.
+    </p>
+  </article>
+  <article class="panel">
+    <h2>5. Try random text safely</h2>
+    <p class="lede" style="margin:0">
+      Go to <a href="/studio">Studio</a>, type anything like <code>asdfgh</code> or a sentence of nonsense,
+      then press <strong>Generate report</strong>. You’ll get a plain-English explanation and a starter template —
+      not a cryptic crash.
+    </p>
+    <div class="controls" style="margin-top:0.8rem">
+      <a class="btn" href="/studio">Open Studio</a>
+      <a class="btn ghost" href="/examples">Open Examples</a>
+    </div>
+  </article>
+</div>
+
+<div class="panel" style="margin-top:1rem">
+  <h2>Mini glossary</h2>
+  <p class="lede" style="margin:0">
+    <strong>Context file</strong> — instructions for an AI agent (<code>AGENTS.md</code>, <code>CLAUDE.md</code>, …).<br/>
+    <strong>MCP</strong> — Model Context Protocol; JSON configs that start tools/servers for the agent.<br/>
+    <strong>Gate</strong> — runs context check + MCP check together (handy for CI).<br/>
+    <strong>Diagnostic</strong> — one finding (rule name + message + suggestion).
+  </p>
+</div>
+{% endblock %}

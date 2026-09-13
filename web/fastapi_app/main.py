@@ -19,6 +19,7 @@ from shared.catalog import (  # noqa: E402
     SAMPLE_MCP_BAD,
     SAMPLE_MCP_GOOD,
 )
+from shared.explain import analyze_mcp_text, friendly_report  # noqa: E402
 from shared.runner import (  # noqa: E402
     DEMO,
     DEMO_GOOD,
@@ -29,6 +30,9 @@ from shared.runner import (  # noqa: E402
     run_init_preview,
     run_mcp,
 )
+
+RANDOM_AGENTS = "asdfgh qwerty hello world !!!@@@\nzzzzzz"
+RANDOM_MCP = "this is not json at all lol 12345"
 
 TEMPLATES_DIR = ROOT / "web" / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
@@ -51,6 +55,7 @@ def ctx(request: Request, active: str, **extra):
         "mcp_lab_url": "/mcp-lab",
         "studio_url": "/studio",
         "about_url": "/about",
+        "guide_url": "/guide",
         **extra,
     }
 
@@ -58,6 +63,11 @@ def ctx(request: Request, active: str, **extra):
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", ctx(request, "/"))
+
+
+@app.get("/guide", response_class=HTMLResponse)
+async def guide(request: Request):
+    return templates.TemplateResponse("guide.html", ctx(request, "/guide"))
 
 
 @app.get("/rules", response_class=HTMLResponse)
@@ -114,17 +124,18 @@ async def mcp_lab_post(
         mcp_json = SAMPLE_MCP_BAD
     elif preset == "good":
         mcp_json = SAMPLE_MCP_GOOD
+    elif preset == "random":
+        mcp_json = RANDOM_MCP
 
+    notice = analyze_mcp_text(mcp_json)
     result = None
-    if not preset or request.headers.get("content-type", "").startswith("application/x-www-form-urlencoded"):
-        # Always validate current textarea unless user only wanted a preset fill without validate —
-        # buttons all submit; if preset set we still validate the filled sample.
+    if notice["ok"]:
         packed = lint_uploaded_context("# MCP lab\n", mcp_json)
         result = packed["mcp"]
 
     return templates.TemplateResponse(
         "mcp_lab.html",
-        ctx(request, "/mcp-lab", mcp_json=mcp_json, result=result),
+        ctx(request, "/mcp-lab", mcp_json=mcp_json, result=result, notice=notice),
     )
 
 
@@ -135,8 +146,8 @@ async def studio_get(request: Request):
         ctx(
             request,
             "/studio",
-            agents_md=SAMPLE_AGENTS_BAD,
-            mcp_json=SAMPLE_MCP_BAD,
+            agents_md="",
+            mcp_json="",
         ),
     )
 
@@ -152,9 +163,17 @@ async def studio_post(
         agents_md, mcp_json = SAMPLE_AGENTS_BAD, SAMPLE_MCP_BAD
     elif preset == "good":
         agents_md, mcp_json = SAMPLE_AGENTS_GOOD, SAMPLE_MCP_GOOD
+    elif preset == "random":
+        agents_md, mcp_json = RANDOM_AGENTS, RANDOM_MCP
 
-    custom = lint_uploaded_context(agents_md, mcp_json)
-    report = build_report(custom["check"], custom.get("mcp"))
+    friendly = friendly_report(agents_md, mcp_json, None, None)
+    custom = None
+    report = None
+    if friendly["mode"] == "lint":
+        custom = lint_uploaded_context(agents_md, mcp_json or None)
+        report = build_report(custom["check"], custom.get("mcp"))
+        friendly = friendly_report(agents_md, mcp_json, custom, report)
+
     return templates.TemplateResponse(
         "studio.html",
         ctx(
@@ -164,6 +183,7 @@ async def studio_post(
             mcp_json=mcp_json,
             custom_result=custom,
             report=report,
+            friendly=friendly,
         ),
     )
 
@@ -215,8 +235,13 @@ async def lint_form(
     agents_md: str = Form(""),
     mcp_json: str = Form(""),
 ):
-    custom = lint_uploaded_context(agents_md, mcp_json or None)
-    report = build_report(custom["check"], custom.get("mcp"))
+    friendly = friendly_report(agents_md, mcp_json, None, None)
+    custom = None
+    report = None
+    if friendly["mode"] == "lint":
+        custom = lint_uploaded_context(agents_md, mcp_json or None)
+        report = build_report(custom["check"], custom.get("mcp"))
+        friendly = friendly_report(agents_md, mcp_json, custom, report)
     return templates.TemplateResponse(
         "index.html",
         ctx(
@@ -225,6 +250,7 @@ async def lint_form(
             action="custom",
             custom_result=custom,
             report=report,
+            friendly=friendly,
             agents_md=agents_md,
             mcp_json=mcp_json,
         ),

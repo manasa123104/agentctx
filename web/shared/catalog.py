@@ -157,6 +157,7 @@ SAMPLE_MCP_GOOD = """{
 
 NAV = [
     {"href": "/", "label": "Desk"},
+    {"href": "/guide", "label": "Guide"},
     {"href": "/rules", "label": "Rules"},
     {"href": "/examples", "label": "Examples"},
     {"href": "/mcp-lab", "label": "MCP Lab"},
