@@ -153,7 +153,75 @@
     }
     .stat b { display: block; font-family: "Syne", sans-serif; font-size: 1.4rem; }
     .stat span { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; text-transform: uppercase; color: var(--mute); }
-    footer { margin-top: 2.5rem; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--mute); }
+    .site-footer {
+      margin-top: 3rem;
+      border-top: 1px solid var(--ink);
+      background: var(--ink);
+      color: #d9cfc3;
+      padding: 1.75rem 1.25rem 1.25rem;
+    }
+    .site-footer .foot-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: grid; gap: 1.25rem;
+    }
+    @media (min-width: 800px) {
+      .site-footer .foot-inner { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+    }
+    .site-footer h3 {
+      font-family: "Syne", sans-serif; font-size: 0.85rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #9fd0b4; margin: 0 0 0.65rem;
+    }
+    .site-footer p { margin: 0; font-size: 0.92rem; line-height: 1.45; color: #b7aa9b; }
+    .site-footer a { color: #efe6da; text-decoration: none; border-bottom: 1px solid transparent; }
+    .site-footer a:hover { border-bottom-color: #9fd0b4; color: #9fd0b4; }
+    .site-footer ul { list-style: none; margin: 0; padding: 0; }
+    .site-footer li { margin: 0.35rem 0; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; }
+    .foot-bottom {
+      max-width: 1080px; margin: 1.25rem auto 0; padding-top: 0.9rem;
+      border-top: 1px solid #2c2622; display: flex; flex-wrap: wrap; gap: 0.75rem;
+      justify-content: space-between; align-items: center;
+      font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; color: #8a7f74;
+    }
+    .toast {
+      position: fixed; right: 1rem; bottom: 1rem; z-index: 40;
+      background: var(--moss-deep); color: var(--paper); padding: 0.65rem 0.9rem;
+      font-family: "Syne", sans-serif; font-size: 0.85rem; opacity: 0; pointer-events: none;
+      transform: translateY(8px); transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.85rem; }
+    .tabs button {
+      background: transparent; color: var(--ink); border: 1px solid var(--line);
+      padding: 0.45rem 0.75rem; font-size: 0.8rem;
+    }
+    .tabs button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .tab-panel { display: none; animation: rise 350ms ease-out both; }
+    .tab-panel.active { display: block; }
+    .counter {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; color: var(--mute);
+      text-align: right; margin-top: 0.3rem;
+    }
+    .copy-btn {
+      float: right; font-size: 0.72rem !important; padding: 0.35rem 0.55rem !important;
+      background: transparent !important; color: #9fd0b4 !important; border-color: #3a3330 !important;
+    }
+    .faq details {
+      border: 1px solid var(--line); background: var(--panel); padding: 0.7rem 0.85rem; margin: 0.45rem 0;
+    }
+    .faq summary {
+      cursor: pointer; font-family: "Syne", sans-serif; font-weight: 700; list-style: none;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; float: right; color: var(--moss); }
+    .faq details[open] summary::after { content: "–"; }
+    .faq p { margin: 0.55rem 0 0; color: var(--mute); }
+    .quick-chip {
+      display: inline-flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.6rem;
+    }
+    .quick-chip button {
+      font-size: 0.75rem; padding: 0.4rem 0.65rem; background: transparent; color: var(--ink);
+    }
+    #themePulse { width: 10px; height: 10px; border-radius: 50%; background: var(--moss); display: inline-block; animation: nudge 1.6s ease-in-out infinite; }
     a { color: var(--moss); }
     @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -169,13 +237,134 @@
           <a href="{{ item.href }}" class="{% if item.href == active %}active{% endif %}">{{ item.label }}</a>
         {% endfor %}
       </nav>
-      <div class="engine">{{ framework }}</div>
+      <div class="engine"><span id="themePulse" aria-hidden="true"></span> {{ framework }}</div>
     </div>
     {% block content %}{% endblock %}
-    <footer>
-      <a href="https://github.com/manasa123104/agentctx">github.com/manasa123104/agentctx</a>
-      · FastAPI :8000 · Django :8001{% if framework == "FastAPI" %} · <a href="/docs">OpenAPI</a>{% endif %}
-    </footer>
   </div>
+
+  <footer class="site-footer">
+    <div class="foot-inner">
+      <div>
+        <h3>agentctx</h3>
+        <p>Lint AI agent context files and MCP configs. Keep instructions short, true, and useful.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="/guide">User guide</a></li>
+          <li><a href="/studio">Paste studio</a></li>
+          <li><a href="/examples">Live examples</a></li>
+          <li><a href="/mcp-lab">MCP lab</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Learn</h3>
+        <ul>
+          <li><a href="/rules">Rules atlas</a></li>
+          <li><a href="/about">About</a></li>
+          {% if framework == "FastAPI" %}<li><a href="/docs">OpenAPI docs</a></li>{% endif %}
+          <li><a href="https://github.com/manasa123104/agentctx" target="_blank" rel="noopener">GitHub repo</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Quick actions</h3>
+        <ul>
+          <li><a href="/studio">Try random text</a></li>
+          <li><a href="/examples">Compare bad vs good</a></li>
+          <li><button type="button" id="copyRepoBtn" style="all:unset;cursor:pointer;color:#efe6da;font-family:IBM Plex Mono,monospace;font-size:0.75rem;border-bottom:1px solid transparent">Copy repo URL</button></li>
+          <li><button type="button" id="backTopBtn" style="all:unset;cursor:pointer;color:#efe6da;font-family:IBM Plex Mono,monospace;font-size:0.75rem;border-bottom:1px solid transparent">Back to top</button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>Running on {{ framework }} · local desk</span>
+      <span>FastAPI :8000 · Django :8001</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      const toast = document.getElementById("toast");
+      function showToast(msg) {
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+      window.agentctxToast = showToast;
+
+      document.getElementById("copyRepoBtn")?.addEventListener("click", async () => {
+        const url = "https://github.com/manasa123104/agentctx";
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("Repo URL copied");
+        } catch {
+          showToast(url);
+        }
+      });
+      document.getElementById("backTopBtn")?.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Tabs
+      document.querySelectorAll("[data-tabs]").forEach((root) => {
+        const buttons = root.querySelectorAll(".tabs button");
+        const panels = root.querySelectorAll(".tab-panel");
+        buttons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-tab");
+            buttons.forEach((b) => b.classList.toggle("active", b === btn));
+            panels.forEach((p) => p.classList.toggle("active", p.id === id));
+          });
+        });
+      });
+
+      // Copy blocks
+      document.querySelectorAll("[data-copy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const sel = btn.getAttribute("data-copy");
+          const el = document.querySelector(sel);
+          if (!el) return;
+          try {
+            await navigator.clipboard.writeText(el.innerText);
+            showToast("Copied to clipboard");
+          } catch {
+            showToast("Copy failed");
+          }
+        });
+      });
+
+      // Live counters
+      document.querySelectorAll("textarea[data-count]").forEach((area) => {
+        const target = document.querySelector(area.getAttribute("data-count"));
+        const update = () => {
+          if (!target) return;
+          const text = area.value || "";
+          const lines = text ? text.split(/\n/).length : 0;
+          target.textContent = text.length + " chars · " + lines + " lines";
+        };
+        area.addEventListener("input", update);
+        update();
+      });
+
+      // Keyboard hint: / focuses first textarea
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "/" && document.activeElement.tagName !== "TEXTAREA" && document.activeElement.tagName !== "INPUT") {
+          const area = document.querySelector("textarea");
+          if (area) {
+            e.preventDefault();
+            area.focus();
+            showToast("Focused editor — press Esc to blur");
+          }
+        }
+        if (e.key === "Escape" && document.activeElement.tagName === "TEXTAREA") {
+          document.activeElement.blur();
+        }
+      });
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

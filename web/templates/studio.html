@@ -4,31 +4,66 @@
 <h1 class="page-title">Paste studio</h1>
 <p class="lede">
   Drop in your AGENTS.md and optional MCP config.
-  New users: type random text on purpose — we’ll tell you what’s wrong in plain English.
-  Prefer a walkthrough? See the <a href="/guide">User guide</a>.
+  Tip: press <strong>/</strong> to focus the editor. Random text gets a friendly explanation.
+  <a href="/guide">User guide</a>
 </p>
 
-<form class="panel" method="post" action="{{ studio_url }}">
-  <div class="desk two">
-    <div>
-      <label for="agents_md">AGENTS.md (or any instruction text)</label>
-      <textarea id="agents_md" name="agents_md" placeholder="Paste here — or try typing asdfgh">{{ agents_md }}</textarea>
-    </div>
-    <div>
-      <label for="mcp_json">.mcp.json (optional)</label>
-      <textarea id="mcp_json" name="mcp_json" placeholder='{"mcpServers":{}}'>{{ mcp_json }}</textarea>
+<div data-tabs>
+  <div class="tabs">
+    <button type="button" class="active" data-tab="tab-edit">Edit</button>
+    <button type="button" data-tab="tab-help">Quick help</button>
+  </div>
+  <div class="tab-panel active" id="tab-edit">
+    <form class="panel" method="post" action="{{ studio_url }}" id="studioForm">
+      <div class="desk two">
+        <div>
+          <label for="agents_md">AGENTS.md (or any instruction text)</label>
+          <textarea id="agents_md" name="agents_md" data-count="#agentsCount" placeholder="Paste here — or try typing asdfgh">{{ agents_md }}</textarea>
+          <div class="counter" id="agentsCount">0 chars · 0 lines</div>
+          <div class="quick-chip">
+            <button type="button" data-fill-agents="# AGENTS&#10;&#10;## Build & test&#10;- Test: `npm test`&#10;">Insert starter</button>
+            <button type="button" data-fill-agents="asdfgh qwerty !!!@@@">Insert random</button>
+          </div>
+        </div>
+        <div>
+          <label for="mcp_json">.mcp.json (optional)</label>
+          <textarea id="mcp_json" name="mcp_json" data-count="#mcpCount" placeholder='{"mcpServers":{}}'>{{ mcp_json }}</textarea>
+          <div class="counter" id="mcpCount">0 chars · 0 lines</div>
+          <div class="quick-chip">
+            <button type="button" data-fill-mcp='{"mcpServers":{"tools":{"command":"npx","env":{"API_KEY":"${API_KEY}"}}}}'>Insert safe MCP</button>
+            <button type="button" data-fill-mcp="not json lol">Insert bad MCP</button>
+          </div>
+        </div>
+      </div>
+      <div class="controls" style="margin-top:0.9rem">
+        <button type="submit">Generate report</button>
+        <button class="ghost" type="submit" name="preset" value="bad">Fill noisy sample</button>
+        <button class="ghost" type="submit" name="preset" value="good">Fill clean sample</button>
+        <button class="ghost" type="submit" name="preset" value="random">Try random text</button>
+      </div>
+    </form>
+  </div>
+  <div class="tab-panel" id="tab-help">
+    <div class="faq">
+      <details open>
+        <summary>What should I paste?</summary>
+        <p>Markdown project instructions for an AI coding agent. Real commands and constraints — not chat messages.</p>
+      </details>
+      <details>
+        <summary>What if I type random text?</summary>
+        <p>We’ll detect it and show tips plus a starter template instead of failing cryptically.</p>
+      </details>
+      <details>
+        <summary>Do I need MCP JSON?</summary>
+        <p>No. Leave it blank if you only want to lint AGENTS.md. Use MCP Lab for config-only checks.</p>
+      </details>
     </div>
   </div>
-  <div class="controls" style="margin-top:0.9rem">
-    <button type="submit">Generate report</button>
-    <button class="ghost" type="submit" name="preset" value="bad">Fill noisy sample</button>
-    <button class="ghost" type="submit" name="preset" value="good">Fill clean sample</button>
-    <button class="ghost" type="submit" name="preset" value="random">Try random text</button>
-  </div>
-</form>
+</div>
 
 {% if friendly and friendly.mode == "teach" %}
 <section class="teach">
+  <button type="button" class="copy-btn" data-copy=".teach pre" style="float:right;background:#1b1714!important;color:#9fd0b4!important;border:1px solid #3a3330!important;padding:0.35rem 0.55rem!important;font-size:0.72rem!important">Copy template</button>
   <h2>{{ friendly.headline }}</h2>
   <p>{{ friendly.summary_line }}</p>
   {% for n in friendly.notices %}
@@ -50,6 +85,7 @@
 
 {% if report and friendly and friendly.mode == "lint" %}
 <section class="out">
+  <button type="button" class="copy-btn" data-copy=".out">Copy report</button>
   <h2>{{ friendly.headline }}</h2>
   <p class="meta">{{ friendly.summary_line }}</p>
   <div class="stat-row">
@@ -73,4 +109,25 @@
   {% endif %}
 </section>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll("[data-fill-agents]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const area = document.getElementById("agents_md");
+      area.value = btn.getAttribute("data-fill-agents");
+      area.dispatchEvent(new Event("input"));
+      window.agentctxToast("Inserted into AGENTS.md");
+    });
+  });
+  document.querySelectorAll("[data-fill-mcp]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const area = document.getElementById("mcp_json");
+      area.value = btn.getAttribute("data-fill-mcp");
+      area.dispatchEvent(new Event("input"));
+      window.agentctxToast("Inserted into MCP box");
+    });
+  });
+</script>
 {% endblock %}

@@ -61,11 +61,23 @@
 
 <div class="panel" style="margin-top:1rem">
   <h2>Mini glossary</h2>
-  <p class="lede" style="margin:0">
-    <strong>Context file</strong> — instructions for an AI agent (<code>AGENTS.md</code>, <code>CLAUDE.md</code>, …).<br/>
-    <strong>MCP</strong> — Model Context Protocol; JSON configs that start tools/servers for the agent.<br/>
-    <strong>Gate</strong> — runs context check + MCP check together (handy for CI).<br/>
-    <strong>Diagnostic</strong> — one finding (rule name + message + suggestion).
-  </p>
+  <div class="faq">
+    <details open>
+      <summary>Context file</summary>
+      <p>Instructions for an AI agent (<code>AGENTS.md</code>, <code>CLAUDE.md</code>, …).</p>
+    </details>
+    <details>
+      <summary>MCP</summary>
+      <p>Model Context Protocol — JSON configs that start tools/servers for the agent.</p>
+    </details>
+    <details>
+      <summary>Gate</summary>
+      <p>Runs context check + MCP check together (handy for CI).</p>
+    </details>
+    <details>
+      <summary>Diagnostic</summary>
+      <p>One finding: rule name + message + suggestion.</p>
+    </details>
+  </div>
 </div>
 {% endblock %}
