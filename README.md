@@ -35,6 +35,30 @@ See [WORKFLOW.md](./WORKFLOW.md) for the full guide.
 
 ---
 
+## Web UI (FastAPI + Django)
+
+Python web frontends that run the same CLI and show live output in the browser.
+
+```bash
+# from repo root
+python -m pip install -r requirements.txt
+
+# FastAPI — http://127.0.0.1:8000
+python -m uvicorn web.fastapi_app.main:app --reload --app-dir . --port 8000
+
+# Django — http://127.0.0.1:8001
+python web/django_app/manage.py runserver 8001
+```
+
+| Server | URL |
+|--------|-----|
+| FastAPI | http://127.0.0.1:8000 |
+| Django | http://127.0.0.1:8001 |
+
+API shortcuts (FastAPI): `/api/workflow`, `/api/check`, `/api/mcp`, `/api/gate`
+
+---
+
 ## Install
 
 ```bash
