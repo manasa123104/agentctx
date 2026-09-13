@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "web"))
 
-from shared.runner import DEMO, run_check, run_gate, run_mcp, run_workflow, lint_uploaded_context
+from shared.runner import DEMO, run_check, run_gate, run_mcp, lint_uploaded_context
 
 
 def home(request):
@@ -21,7 +21,6 @@ def home(request):
             "framework": "Django",
             "run_url": "/run",
             "lint_url": "/lint",
-            "image_prefix": "/static/",
         },
     )
 
@@ -30,7 +29,6 @@ def home(request):
 def run_action(request):
     action = request.POST.get("action", "check")
     runners = {
-        "workflow": run_workflow,
         "check": run_check,
         "mcp": run_mcp,
         "gate": run_gate,
@@ -46,7 +44,6 @@ def run_action(request):
             "result": result,
             "run_url": "/run",
             "lint_url": "/lint",
-            "image_prefix": "/static/",
         },
     )
 
@@ -68,6 +65,5 @@ def lint_form(request):
             "mcp_json": mcp_json,
             "run_url": "/run",
             "lint_url": "/lint",
-            "image_prefix": "/static/",
         },
     )

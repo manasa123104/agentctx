@@ -5,13 +5,12 @@ from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "web"))
 
-from shared.runner import DEMO, run_check, run_gate, run_mcp, run_workflow, lint_uploaded_context  # noqa: E402
+from shared.runner import DEMO, run_check, run_gate, run_mcp, lint_uploaded_context  # noqa: E402
 
 APP_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(APP_DIR / "templates"))
@@ -21,10 +20,6 @@ app = FastAPI(
     description="Lint AI agent context files — FastAPI web UI",
     version="1.0.0",
 )
-
-docs_images = ROOT / "docs" / "images"
-if docs_images.exists():
-    app.mount("/images", StaticFiles(directory=str(docs_images)), name="images")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -37,11 +32,6 @@ async def home(request: Request):
             "framework": "FastAPI",
         },
     )
-
-
-@app.get("/api/workflow")
-async def api_workflow():
-    return run_workflow()
 
 
 @app.get("/api/check")
@@ -62,7 +52,6 @@ async def api_gate():
 @app.post("/run", response_class=HTMLResponse)
 async def run_action(request: Request, action: str = Form("check")):
     runners = {
-        "workflow": run_workflow,
         "check": run_check,
         "mcp": run_mcp,
         "gate": run_gate,

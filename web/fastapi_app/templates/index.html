@@ -3,148 +3,268 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>agentctx — {{ framework }}</title>
+  <title>agentctx</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f1419;
-      --panel: #171e26;
-      --ink: #e8eef4;
-      --muted: #8b9aab;
-      --accent: #3db89a;
-      --warn: #e0a84a;
-      --err: #e26d6d;
-      --line: #2a3542;
+      --ink: #14110f;
+      --paper: #f3ebe1;
+      --sand: #e7d8c5;
+      --moss: #2f6b4f;
+      --moss-deep: #1d4332;
+      --ember: #c45c26;
+      --line: #d5c4b0;
+      --mute: #6d6258;
+      --panel: #fffaf4;
     }
     * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
     body {
-      margin: 0;
-      font-family: "DM Sans", sans-serif;
+      font-family: "Newsreader", Georgia, serif;
       color: var(--ink);
       background:
-        radial-gradient(1200px 600px at 10% -10%, #1a3a34 0%, transparent 55%),
-        radial-gradient(900px 500px at 100% 0%, #243048 0%, transparent 50%),
-        var(--bg);
-      min-height: 100vh;
+        linear-gradient(115deg, transparent 0 42%, rgba(196, 92, 38, 0.07) 42% 43%, transparent 43%),
+        repeating-linear-gradient(
+          -18deg,
+          var(--paper) 0 14px,
+          var(--sand) 14px 15px
+        );
     }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .engine {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mute);
+    }
+    .hero {
+      display: grid;
+      gap: 1.25rem;
+      align-items: end;
+      min-height: min(70vh, 560px);
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--line);
+      animation: rise 700ms ease-out both;
+    }
+    @media (min-width: 860px) {
+      .hero {
+        grid-template-columns: 1.3fr 0.9fr;
+        gap: 2rem;
+      }
+    }
     .brand {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      margin: 0 0 0.35rem;
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: clamp(3.4rem, 12vw, 7.2rem);
+      line-height: 0.88;
+      letter-spacing: -0.055em;
+      margin: 0;
+      color: var(--ink);
     }
-    .tag {
+    .brand span {
+      color: var(--moss);
       display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--accent);
-      border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-      padding: 0.2rem 0.55rem;
-      border-radius: 999px;
-      margin-bottom: 1rem;
+      transform: translateY(0);
+      animation: nudge 2.8s ease-in-out infinite;
     }
-    .lead { color: var(--muted); max-width: 40rem; line-height: 1.5; margin: 0 0 1.5rem; }
-    .hero-img {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      margin: 1rem 0 1.75rem;
-      display: block;
+    .blurb {
+      font-size: 1.15rem;
+      line-height: 1.45;
+      max-width: 28ch;
+      margin: 0;
+      color: var(--mute);
     }
-    .actions {
+    .orb {
+      position: relative;
+      min-height: 220px;
+      border: 1px solid var(--ink);
+      background:
+        radial-gradient(circle at 30% 30%, #f7c9a8 0%, transparent 42%),
+        radial-gradient(circle at 70% 60%, #9fd0b4 0%, transparent 45%),
+        var(--ink);
+      overflow: hidden;
+      animation: rise 900ms 80ms ease-out both;
+    }
+    .orb::before,
+    .orb::after {
+      content: "";
+      position: absolute;
+      inset: 12% 10%;
+      border: 1px solid rgba(243, 235, 225, 0.35);
+      border-radius: 50%;
+    }
+    .orb::after {
+      inset: 28% 26%;
+      border-style: dashed;
+      animation: spin 18s linear infinite;
+    }
+    .orb-label {
+      position: absolute;
+      left: 1rem;
+      bottom: 1rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--paper);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-bottom: 1.5rem;
+      gap: 0.65rem;
+      margin-top: 0.5rem;
     }
-    button, .btn {
-      font: inherit;
-      font-weight: 600;
-      border: 0;
-      border-radius: 8px;
-      padding: 0.65rem 1rem;
+    button {
+      font-family: "Syne", sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0.75rem 1.1rem;
       cursor: pointer;
-      background: var(--accent);
-      color: #06241c;
-      text-decoration: none;
+      transition: transform 160ms ease, background 160ms ease;
     }
-    button.secondary, .btn.secondary {
+    button:hover { transform: translateY(-2px); background: var(--moss-deep); border-color: var(--moss-deep); }
+    button.ghost {
       background: transparent;
       color: var(--ink);
-      border: 1px solid var(--line);
+    }
+    button.ghost:hover { background: var(--ember); color: var(--paper); border-color: var(--ember); }
+    .desk {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    @media (min-width: 860px) {
+      .desk { grid-template-columns: 1fr 1fr; }
     }
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 1rem 1.1rem;
-      margin-top: 1rem;
+      padding: 1rem;
+      animation: rise 650ms 120ms ease-out both;
     }
-    .panel h2 { margin: 0 0 0.75rem; font-size: 1rem; }
+    .panel h2 {
+      font-family: "Syne", sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin: 0 0 0.75rem;
+    }
+    label {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      color: var(--mute);
+      margin: 0 0 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      border: 1px solid var(--line);
+      background: #faf4ec;
+      color: var(--ink);
+      padding: 0.75rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.8rem;
+      resize: vertical;
+    }
+    .out {
+      margin-top: 1.25rem;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: #efe6da;
+      padding: 1rem;
+      animation: rise 500ms ease-out both;
+    }
+    .out h2 {
+      font-family: "Syne", sans-serif;
+      font-size: 0.9rem;
+      margin: 0 0 0.5rem;
+      color: #9fd0b4;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.75rem;
+      color: #b7aa9b;
+      margin-bottom: 0.65rem;
+    }
+    .ok { color: #9fd0b4; }
+    .bad { color: #f0a37a; }
     pre {
       margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
       font-family: "IBM Plex Mono", monospace;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       line-height: 1.45;
-      color: #d5e0ea;
     }
-    .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
-    .ok { color: var(--accent); }
-    .bad { color: var(--err); }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin: 0.75rem 0 0.35rem; }
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      background: #10161d;
-      color: var(--ink);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 0.75rem;
+    footer {
+      margin-top: 2.5rem;
       font-family: "IBM Plex Mono", monospace;
-      font-size: 0.82rem;
+      font-size: 0.75rem;
+      color: var(--mute);
     }
-    .grid { display: grid; gap: 1rem; }
-    @media (min-width: 800px) {
-      .grid.two { grid-template-columns: 1fr 1fr; }
+    a { color: var(--moss); }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    footer { margin-top: 2rem; color: var(--muted); font-size: 0.85rem; }
-    a { color: var(--accent); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes nudge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <span class="tag">{{ framework }} web UI</span>
-    <h1 class="brand">agentctx</h1>
-    <p class="lead">
-      Lint AI agent context files and MCP configs.
-      Workflow: init → check → slim → mcp → gate.
-      Demo target: <code>{{ demo_path }}</code>
-    </p>
+  <div class="shell">
+    <div class="top">
+      <div class="engine">{{ framework }} · context signal desk</div>
+      <div class="engine">demo ready</div>
+    </div>
 
-    <img class="hero-img" src="/images/workflow-overview.png" alt="agentctx workflow overview" />
-
-    <form class="actions" method="post" action="/run">
-      <button type="submit" name="action" value="workflow">Run workflow</button>
-      <button type="submit" name="action" value="check">Run check</button>
-      <button type="submit" name="action" value="mcp">Run mcp</button>
-      <button type="submit" name="action" value="gate">Run gate</button>
-    </form>
+    <section class="hero">
+      <div>
+        <h1 class="brand">agent<span>ctx</span></h1>
+        <p class="blurb">Catch stale paths, dead commands, and noisy agent instructions before they burn tokens.</p>
+        <form class="controls" method="post" action="/run">
+          <button type="submit" name="action" value="check">Scan context</button>
+          <button class="ghost" type="submit" name="action" value="mcp">Scan MCP</button>
+          <button class="ghost" type="submit" name="action" value="gate">Full gate</button>
+        </form>
+      </div>
+      <div class="orb" aria-hidden="true">
+        <div class="orb-label">noise → signal</div>
+      </div>
+    </section>
 
     {% if result %}
-    <section class="panel">
-      <h2>Output — {{ action }}</h2>
+    <section class="out">
+      <h2>Result · {{ action }}</h2>
       <p class="meta">
         exit
-        {% if result.exit_code == 0 %}
-          <span class="ok">{{ result.exit_code }}</span>
-        {% else %}
-          <span class="bad">{{ result.exit_code }}</span>
-        {% endif %}
+        {% if result.exit_code == 0 %}<span class="ok">{{ result.exit_code }}</span>
+        {% else %}<span class="bad">{{ result.exit_code }}</span>{% endif %}
         · {{ result.command }}
       </p>
       <pre>{{ result.stdout }}{% if result.stderr %}
@@ -154,40 +274,40 @@
     {% endif %}
 
     {% if custom_result %}
-    <section class="panel">
-      <h2>Custom lint — check</h2>
+    <section class="out">
+      <h2>Custom scan · context</h2>
       <p class="meta">exit {{ custom_result.check.exit_code }}</p>
       <pre>{{ custom_result.check.stdout }}</pre>
       {% if custom_result.mcp %}
-      <h2 style="margin-top:1rem">Custom lint — mcp</h2>
+      <h2 style="margin-top:1rem">Custom scan · MCP</h2>
       <p class="meta">exit {{ custom_result.mcp.exit_code }}</p>
       <pre>{{ custom_result.mcp.stdout }}</pre>
       {% endif %}
     </section>
     {% endif %}
 
-    <section class="panel">
-      <h2>Paste your own files</h2>
-      <form method="post" action="/lint">
-        <div class="grid two">
+    <section class="desk">
+      <form class="panel" method="post" action="/lint" style="grid-column: 1 / -1;">
+        <h2>Bring your own files</h2>
+        <div class="desk">
           <div>
             <label for="agents_md">AGENTS.md</label>
-            <textarea id="agents_md" name="agents_md" placeholder="# AGENTS.md">{{ agents_md or "" }}</textarea>
+            <textarea id="agents_md" name="agents_md" placeholder="# keep this short and true">{{ agents_md or "" }}</textarea>
           </div>
           <div>
-            <label for="mcp_json">.mcp.json (optional)</label>
+            <label for="mcp_json">.mcp.json</label>
             <textarea id="mcp_json" name="mcp_json" placeholder='{"mcpServers":{}}'>{{ mcp_json or "" }}</textarea>
           </div>
         </div>
-        <div class="actions" style="margin-top:0.9rem;margin-bottom:0">
-          <button type="submit">Lint pasted content</button>
+        <div class="controls" style="margin-top:0.9rem">
+          <button type="submit">Lint paste</button>
         </div>
       </form>
     </section>
 
     <footer>
-      Repo: <a href="https://github.com/manasa123104/agentctx">github.com/manasa123104/agentctx</a>
-      · Also available as Django on port 8001
+      <a href="https://github.com/manasa123104/agentctx">github.com/manasa123104/agentctx</a>
+      · Django twin on :8001
     </footer>
   </div>
 </body>
