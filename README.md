@@ -13,15 +13,7 @@ npx agentctx check
 
 ## Clear workflow
 
-```
-init  →  check  →  slim  →  mcp  →  gate
-  │        │        │       │       │
-  │        │        │       │       └─ CI exit code
-  │        │        │       └─ validate MCP configs
-  │        │        └─ auto-remove error bloat
-  │        └─ lint context files
-  └─ generate minimal AGENTS.md
-```
+![agentctx workflow: init → check → slim → mcp → gate](docs/images/workflow-overview.png)
 
 | Step | Command | Purpose |
 |------|---------|---------|
@@ -30,6 +22,8 @@ init  →  check  →  slim  →  mcp  →  gate
 | 3 | `agentctx slim <file>` | Remove error-severity content in place |
 | 4 | `agentctx mcp` | Validate MCP server configs |
 | 5 | `agentctx gate` | CI gate = `check` + `mcp` |
+
+![Daily developer loop](docs/images/workflow-daily-loop.png)
 
 Print the same loop anytime:
 
@@ -146,9 +140,3 @@ agentctx gate [path] [--strict]
 ```
 
 SARIF upload example is in [WORKFLOW.md](./WORKFLOW.md).
-
----
-
-## License
-
-MIT

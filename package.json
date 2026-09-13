@@ -21,16 +21,15 @@
     "developer-tools"
   ],
   "author": "manasa123104",
-  "license": "MIT",
   "engines": {
     "node": ">=18"
   },
   "files": [
     "bin/",
     "src/",
+    "docs/",
     "README.md",
-    "WORKFLOW.md",
-    "LICENSE"
+    "WORKFLOW.md"
   ],
   "dependencies": {
     "commander": "^12.0.0"

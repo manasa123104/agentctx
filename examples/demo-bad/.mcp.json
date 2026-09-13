@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tools": {
+      "command": "npx",
+      "env": {
+        "OPENAI_API_KEY": "sk-demo-hardcoded-key"
+      }
+    },
+    "local": {
+      "url": "http://localhost:8080/mcp",
+      "transport": "sse"
+    }
+  }
+}

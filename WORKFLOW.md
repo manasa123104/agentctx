@@ -2,14 +2,9 @@
 
 This project is built around one loop: **keep agent context accurate and small**.
 
-```
-┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐
-│  init   │ ──▶ │  check  │ ──▶ │  slim   │ ──▶ │   mcp   │ ──▶ │  gate   │
-└─────────┘     └─────────┘     └─────────┘     └─────────┘     └─────────┘
-     │               │               │               │               │
-  generate        report          auto-fix       validate         CI exit
-  AGENTS.md       issues          errors          .mcp.json        code
-```
+![agentctx workflow overview](docs/images/workflow-overview.png)
+
+![Daily developer loop](docs/images/workflow-daily-loop.png)
 
 Re-run `check` after every edit until the file is clean, then rely on `gate` in CI.
 
