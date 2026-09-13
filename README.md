@@ -37,16 +37,20 @@ See [WORKFLOW.md](./WORKFLOW.md) for the full guide.
 
 ## Web UI (FastAPI + Django)
 
-Python web frontends that run check / mcp / gate and show live output.
+Multi-page desks for scanning context files and MCP configs.
+
+| Page | Path |
+|------|------|
+| Desk | `/` |
+| Rules atlas | `/rules` |
+| Live examples | `/examples` |
+| MCP lab | `/mcp-lab` |
+| Paste studio | `/studio` |
+| About + init preview | `/about` |
 
 ```bash
-# from repo root
 python -m pip install -r requirements.txt
-
-# FastAPI — http://127.0.0.1:8000
 python -m uvicorn web.fastapi_app.main:app --reload --host 127.0.0.1 --port 8000
-
-# Django — http://127.0.0.1:8001
 python web/django_app/manage.py runserver 8001
 ```
 
@@ -55,7 +59,7 @@ python web/django_app/manage.py runserver 8001
 | FastAPI | http://127.0.0.1:8000 |
 | Django | http://127.0.0.1:8001 |
 
-API shortcuts (FastAPI): `/api/check`, `/api/mcp`, `/api/gate`
+API: `/api/check`, `/api/mcp`, `/api/gate`, `/api/rules`, `/docs`
 
 ---
 

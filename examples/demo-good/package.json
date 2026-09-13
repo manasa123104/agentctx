@@ -1,0 +1,7 @@
+{
+  "name": "demo-good",
+  "scripts": {
+    "test": "echo ok",
+    "build": "echo build"
+  }
+}

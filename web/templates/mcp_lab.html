@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}agentctx · MCP lab{% endblock %}
+{% block content %}
+<h1 class="page-title">MCP lab</h1>
+<p class="lede">Validate `.mcp.json` alone — secrets, localhost URLs, schema, and transport.</p>
+
+<form class="panel" method="post" action="{{ mcp_lab_url }}">
+  <label for="mcp_json">Paste MCP config</label>
+  <textarea id="mcp_json" name="mcp_json">{{ mcp_json }}</textarea>
+  <div class="controls" style="margin-top:0.8rem">
+    <button type="submit">Validate MCP</button>
+    <button class="ghost" type="submit" name="preset" value="bad">Load bad sample</button>
+    <button class="ghost" type="submit" name="preset" value="good">Load good sample</button>
+  </div>
+</form>
+
+{% if result %}
+<section class="out">
+  <h2>MCP result</h2>
+  <p class="meta">exit {% if result.exit_code == 0 %}<span class="ok">{{ result.exit_code }}</span>{% else %}<span class="bad">{{ result.exit_code }}</span>{% endif %}</p>
+  {% for d in result.diagnostics or [] %}
+  <div class="diag {{ d.severity }}"><strong>{{ d.rule }}</strong> · {{ d.message }}</div>
+  {% endfor %}
+  <pre style="margin-top:0.8rem">{{ result.stdout }}</pre>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}agentctx · desk{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <h1 class="brand">agent<span>ctx</span></h1>
+    <p class="blurb">Catch stale paths, dead commands, and noisy agent instructions before they burn tokens.</p>
+    <form class="controls" method="post" action="{{ run_url }}">
+      <button type="submit" name="action" value="check">Scan context</button>
+      <button class="ghost" type="submit" name="action" value="mcp">Scan MCP</button>
+      <button class="ghost" type="submit" name="action" value="gate">Full gate</button>
+    </form>
+  </div>
+  <div class="orb" aria-hidden="true"><div class="orb-label">noise → signal</div></div>
+</section>
+
+{% if result %}
+<section class="out">
+  <h2>Result · {{ action }}</h2>
+  <p class="meta">
+    exit {% if result.exit_code == 0 %}<span class="ok">{{ result.exit_code }}</span>{% else %}<span class="bad">{{ result.exit_code }}</span>{% endif %}
+    · {{ result.command }}
+  </p>
+  <pre>{{ result.stdout }}{% if result.stderr %}
+
+{{ result.stderr }}{% endif %}</pre>
+</section>
+{% endif %}
+
+{% if custom_result %}
+<section class="out">
+  <h2>Custom scan</h2>
+  {% if report %}
+  <div class="stat-row">
+    <div class="stat"><b>{{ report.summary.errors }}</b><span>errors</span></div>
+    <div class="stat"><b>{{ report.summary.warnings }}</b><span>warnings</span></div>
+    <div class="stat"><b>{{ report.summary.info }}</b><span>info</span></div>
+  </div>
+  {% for d in report.diagnostics %}
+  <div class="diag {{ d.severity }}"><strong>{{ d.rule }}</strong> · {{ d.message }}</div>
+  {% endfor %}
+  {% endif %}
+  <pre style="margin-top:1rem">{{ custom_result.check.stdout }}</pre>
+</section>
+{% endif %}
+
+<section class="desk two" style="margin-top:1.5rem">
+  <a class="panel" href="/rules" style="text-decoration:none;color:inherit">
+    <h2>Rules atlas</h2>
+    <p class="lede" style="margin:0">Browse every context + MCP rule.</p>
+  </a>
+  <a class="panel" href="/examples" style="text-decoration:none;color:inherit">
+    <h2>Live examples</h2>
+    <p class="lede" style="margin:0">Compare clean vs noisy fixtures.</p>
+  </a>
+  <a class="panel" href="/mcp-lab" style="text-decoration:none;color:inherit">
+    <h2>MCP lab</h2>
+    <p class="lede" style="margin:0">Validate server configs in isolation.</p>
+  </a>
+  <a class="panel" href="/studio" style="text-decoration:none;color:inherit">
+    <h2>Paste studio</h2>
+    <p class="lede" style="margin:0">Lint your own AGENTS.md + .mcp.json.</p>
+  </a>
+</section>
+{% endblock %}

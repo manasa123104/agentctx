@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}agentctx · examples{% endblock %}
+{% block content %}
+<h1 class="page-title">Live examples</h1>
+<p class="lede">Run the shipped fixtures and compare a noisy project against a clean one.</p>
+
+<div class="desk two">
+  <form class="panel" method="post" action="{{ examples_url }}">
+    <h2>demo-bad</h2>
+    <p class="lede">Directory trees, missing scripts, hardcoded secrets.</p>
+    <input type="hidden" name="fixture" value="bad" />
+    <div class="controls">
+      <button type="submit" name="action" value="check">Scan context</button>
+      <button class="ghost" type="submit" name="action" value="mcp">Scan MCP</button>
+      <button class="ghost" type="submit" name="action" value="gate">Gate</button>
+    </div>
+  </form>
+  <form class="panel" method="post" action="{{ examples_url }}">
+    <h2>demo-good</h2>
+    <p class="lede">Minimal, accurate context + safe MCP env references.</p>
+    <input type="hidden" name="fixture" value="good" />
+    <div class="controls">
+      <button type="submit" name="action" value="check">Scan context</button>
+      <button class="ghost" type="submit" name="action" value="mcp">Scan MCP</button>
+      <button class="ghost" type="submit" name="action" value="gate">Gate</button>
+    </div>
+  </form>
+</div>
+
+{% if result %}
+<section class="out">
+  <h2>{{ fixture }} · {{ action }}</h2>
+  <p class="meta">
+    exit {% if result.exit_code == 0 %}<span class="ok">{{ result.exit_code }}</span>{% else %}<span class="bad">{{ result.exit_code }}</span>{% endif %}
+  </p>
+  {% if result.diagnostics %}
+    {% for d in result.diagnostics %}
+    <div class="diag {{ d.severity }}"><strong>{{ d.rule }}</strong> · {{ d.message }}</div>
+    {% endfor %}
+  {% endif %}
+  <pre style="margin-top:0.8rem">{{ result.stdout }}</pre>
+</section>
+{% endif %}
+{% endblock %}

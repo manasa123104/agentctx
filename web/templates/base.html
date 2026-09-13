@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}agentctx{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14110f;
+      --paper: #f3ebe1;
+      --sand: #e7d8c5;
+      --moss: #2f6b4f;
+      --moss-deep: #1d4332;
+      --ember: #c45c26;
+      --line: #d5c4b0;
+      --mute: #6d6258;
+      --panel: #fffaf4;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "Newsreader", Georgia, serif;
+      color: var(--ink);
+      background:
+        linear-gradient(115deg, transparent 0 42%, rgba(196, 92, 38, 0.07) 42% 43%, transparent 43%),
+        repeating-linear-gradient(-18deg, var(--paper) 0 14px, var(--sand) 14px 15px);
+    }
+    .shell { max-width: 1080px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 0.75rem; margin-bottom: 1.75rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--line);
+    }
+    .logo {
+      font-family: "Syne", sans-serif; font-weight: 800; font-size: 1.35rem;
+      letter-spacing: -0.04em; text-decoration: none; color: var(--ink);
+    }
+    .logo span { color: var(--moss); }
+    nav { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    nav a {
+      font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.06em; text-decoration: none; color: var(--mute);
+      border: 1px solid transparent; padding: 0.4rem 0.55rem;
+    }
+    nav a:hover, nav a.active { color: var(--ink); border-color: var(--line); background: var(--panel); }
+    .engine { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); }
+    .hero {
+      display: grid; gap: 1.25rem; align-items: end; min-height: min(58vh, 460px);
+      padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); animation: rise 700ms ease-out both;
+    }
+    @media (min-width: 860px) { .hero { grid-template-columns: 1.3fr 0.9fr; gap: 2rem; } }
+    .brand {
+      font-family: "Syne", sans-serif; font-weight: 800; font-size: clamp(3rem, 11vw, 6.4rem);
+      line-height: 0.88; letter-spacing: -0.055em; margin: 0;
+    }
+    .brand span { color: var(--moss); display: inline-block; animation: nudge 2.8s ease-in-out infinite; }
+    .blurb { font-size: 1.12rem; line-height: 1.45; max-width: 30ch; margin: 0; color: var(--mute); }
+    .orb {
+      position: relative; min-height: 200px; border: 1px solid var(--ink);
+      background:
+        radial-gradient(circle at 30% 30%, #f7c9a8 0%, transparent 42%),
+        radial-gradient(circle at 70% 60%, #9fd0b4 0%, transparent 45%),
+        var(--ink);
+      overflow: hidden; animation: rise 900ms 80ms ease-out both;
+    }
+    .orb::before, .orb::after {
+      content: ""; position: absolute; inset: 12% 10%;
+      border: 1px solid rgba(243, 235, 225, 0.35); border-radius: 50%;
+    }
+    .orb::after { inset: 28% 26%; border-style: dashed; animation: spin 18s linear infinite; }
+    .orb-label {
+      position: absolute; left: 1rem; bottom: 1rem; font-family: "IBM Plex Mono", monospace;
+      font-size: 0.7rem; color: var(--paper); letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .controls { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 0.5rem; }
+    button, .btn {
+      font-family: "Syne", sans-serif; font-weight: 700; font-size: 0.92rem; border: 1px solid var(--ink);
+      background: var(--ink); color: var(--paper); padding: 0.7rem 1rem; cursor: pointer;
+      text-decoration: none; display: inline-block; transition: transform 160ms ease, background 160ms ease;
+    }
+    button:hover, .btn:hover { transform: translateY(-2px); background: var(--moss-deep); border-color: var(--moss-deep); }
+    button.ghost, .btn.ghost { background: transparent; color: var(--ink); }
+    button.ghost:hover, .btn.ghost:hover { background: var(--ember); color: var(--paper); border-color: var(--ember); }
+    .desk { display: grid; gap: 1rem; margin-top: 1.5rem; }
+    @media (min-width: 860px) { .desk.two { grid-template-columns: 1fr 1fr; } .desk.three { grid-template-columns: repeat(3, 1fr); } }
+    .panel { background: var(--panel); border: 1px solid var(--line); padding: 1rem; animation: rise 650ms 120ms ease-out both; }
+    .panel h2, .page-title {
+      font-family: "Syne", sans-serif; font-size: 0.95rem; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0 0 0.75rem;
+    }
+    .page-title { font-size: clamp(1.8rem, 4vw, 2.6rem); text-transform: none; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+    .lede { color: var(--mute); margin: 0 0 1.25rem; max-width: 52ch; }
+    label {
+      display: block; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--mute);
+      margin: 0 0 0.4rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    textarea, input[type="text"] {
+      width: 100%; min-height: 140px; border: 1px solid var(--line); background: #faf4ec; color: var(--ink);
+      padding: 0.75rem; font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; resize: vertical;
+    }
+    input[type="text"] { min-height: auto; }
+    .out {
+      margin-top: 1.25rem; border: 1px solid var(--ink); background: var(--ink); color: #efe6da;
+      padding: 1rem; animation: rise 500ms ease-out both;
+    }
+    .out h2 { font-family: "Syne", sans-serif; font-size: 0.9rem; margin: 0 0 0.5rem; color: #9fd0b4; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: #b7aa9b; margin-bottom: 0.65rem; }
+    .ok { color: #9fd0b4; }
+    .bad { color: #f0a37a; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; line-height: 1.45; }
+    .badge {
+      display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.68rem;
+      text-transform: uppercase; letter-spacing: 0.05em; padding: 0.15rem 0.4rem; border: 1px solid currentColor;
+    }
+    .badge.error { color: var(--ember); }
+    .badge.warn { color: #9a6b1f; }
+    .badge.info { color: var(--moss); }
+    .rule-card h3 { font-family: "Syne", sans-serif; font-size: 1rem; margin: 0.35rem 0; }
+    .rule-card p { margin: 0; color: var(--mute); }
+    .diag {
+      border-left: 3px solid var(--line); padding: 0.55rem 0.7rem; margin: 0.45rem 0; background: #1b1714;
+    }
+    .diag.error { border-color: #f0a37a; }
+    .diag.warn { border-color: #e0b35a; }
+    .diag.info { border-color: #9fd0b4; }
+    .diag strong { font-family: "Syne", sans-serif; }
+    .stat-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0.75rem 0 1rem; }
+    .stat {
+      border: 1px solid var(--line); background: var(--panel); padding: 0.7rem 0.9rem; min-width: 110px;
+    }
+    .stat b { display: block; font-family: "Syne", sans-serif; font-size: 1.4rem; }
+    .stat span { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; text-transform: uppercase; color: var(--mute); }
+    footer { margin-top: 2.5rem; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--mute); }
+    a { color: var(--moss); }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <a class="logo" href="/">agent<span>ctx</span></a>
+      <nav>
+        {% for item in nav %}
+          <a href="{{ item.href }}" class="{% if item.href == active %}active{% endif %}">{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+      <div class="engine">{{ framework }}</div>
+    </div>
+    {% block content %}{% endblock %}
+    <footer>
+      <a href="https://github.com/manasa123104/agentctx">github.com/manasa123104/agentctx</a>
+      · FastAPI :8000 · Django :8001{% if framework == "FastAPI" %} · <a href="/docs">OpenAPI</a>{% endif %}
+    </footer>
+  </div>
+</body>
+</html>

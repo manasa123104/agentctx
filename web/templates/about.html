@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}agentctx · about{% endblock %}
+{% block content %}
+<h1 class="page-title">About agentctx</h1>
+<p class="lede">A linter for AI agent context files and MCP configs — CLI first, with FastAPI and Django web desks.</p>
+
+<div class="desk two">
+  <article class="panel">
+    <h2>What it catches</h2>
+    <p class="lede" style="margin:0">Missing paths, dead npm/make commands, directory-tree bloat, inferable stack prose, hardcoded MCP secrets, localhost URLs, and more.</p>
+  </article>
+  <article class="panel">
+    <h2>How to run locally</h2>
+    <pre style="color:var(--ink);background:#faf4ec;padding:0.75rem;border:1px solid var(--line)">node bin/agentctx.js check
+node bin/agentctx.js mcp
+node bin/agentctx.js gate</pre>
+  </article>
+  <article class="panel">
+    <h2>Web desks</h2>
+    <p class="lede" style="margin:0">FastAPI on port 8000 and Django on 8001 share this multi-page UI: desk, rules, examples, MCP lab, and studio.</p>
+  </article>
+  <article class="panel">
+    <h2>Init preview</h2>
+    <p class="lede">Preview a generated AGENTS.md from this repo’s metadata.</p>
+    <form method="post" action="{{ about_url }}">
+      <button type="submit" name="action" value="init">Preview init --dry-run</button>
+    </form>
+  </article>
+</div>
+
+{% if result %}
+<section class="out">
+  <h2>Init preview</h2>
+  <pre>{{ result.stdout }}</pre>
+</section>
+{% endif %}
+{% endblock %}

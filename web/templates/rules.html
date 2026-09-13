@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}agentctx · rules{% endblock %}
+{% block content %}
+<h1 class="page-title">Rules atlas</h1>
+<p class="lede">Every check the scanner can raise — context files and MCP configs.</p>
+
+<h2 class="panel" style="border:0;background:transparent;padding-left:0">Context rules</h2>
+<div class="desk two">
+  {% for rule in context_rules %}
+  <article class="panel rule-card">
+    <span class="badge {{ rule.severity }}">{{ rule.severity }}</span>
+    <h3>{{ rule.id }}</h3>
+    <p>{{ rule.summary }}</p>
+  </article>
+  {% endfor %}
+</div>
+
+<h2 class="panel" style="border:0;background:transparent;padding-left:0;margin-top:1.5rem">MCP rules</h2>
+<div class="desk two">
+  {% for rule in mcp_rules %}
+  <article class="panel rule-card">
+    <span class="badge {{ rule.severity }}">{{ rule.severity }}</span>
+    <h3>{{ rule.id }}</h3>
+    <p>{{ rule.summary }}</p>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

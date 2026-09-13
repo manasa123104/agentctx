@@ -31,9 +31,9 @@ WSGI_APPLICATION = "wsgi.application"
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [str(BASE_DIR / "templates")],
-        "APP_DIRS": True,
+        "BACKEND": "django.template.backends.jinja2.Jinja2",
+        "DIRS": [str(ROOT / "web" / "templates")],
+        "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",

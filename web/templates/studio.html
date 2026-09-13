@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}agentctx · studio{% endblock %}
+{% block content %}
+<h1 class="page-title">Paste studio</h1>
+<p class="lede">Drop in your AGENTS.md and optional MCP config. Get a scored report with rule cards.</p>
+
+<form class="panel" method="post" action="{{ studio_url }}">
+  <div class="desk two">
+    <div>
+      <label for="agents_md">AGENTS.md</label>
+      <textarea id="agents_md" name="agents_md">{{ agents_md }}</textarea>
+    </div>
+    <div>
+      <label for="mcp_json">.mcp.json</label>
+      <textarea id="mcp_json" name="mcp_json">{{ mcp_json }}</textarea>
+    </div>
+  </div>
+  <div class="controls" style="margin-top:0.9rem">
+    <button type="submit">Generate report</button>
+    <button class="ghost" type="submit" name="preset" value="bad">Fill noisy sample</button>
+    <button class="ghost" type="submit" name="preset" value="good">Fill clean sample</button>
+  </div>
+</form>
+
+{% if report %}
+<section class="out">
+  <h2>Report {% if report.passed %}<span class="ok">passed</span>{% else %}<span class="bad">failed</span>{% endif %}</h2>
+  <div class="stat-row">
+    <div class="stat"><b>{{ report.summary.errors }}</b><span>errors</span></div>
+    <div class="stat"><b>{{ report.summary.warnings }}</b><span>warnings</span></div>
+    <div class="stat"><b>{{ report.summary.info }}</b><span>info</span></div>
+  </div>
+  {% for d in report.diagnostics %}
+  <div class="diag {{ d.severity }}">
+    <strong>{{ d.rule }}</strong>
+    {% if d.line %} · L{{ d.line }}{% endif %}
+    {% if d.server %} · {{ d.server }}{% endif %}
+    <div>{{ d.message }}</div>
+    {% if d.suggestion %}<div class="meta">{{ d.suggestion }}</div>{% endif %}
+  </div>
+  {% else %}
+  <p class="ok">No diagnostics — looking sharp.</p>
+  {% endfor %}
+  {% if custom_result %}
+  <pre style="margin-top:1rem">{{ custom_result.check.stdout }}</pre>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}
